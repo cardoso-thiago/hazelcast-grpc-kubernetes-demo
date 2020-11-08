@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hazelcast-publisher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hazelcast-publisher
+  template:
+    metadata:
+      labels:
+        app: hazelcast-publisher
+    spec:
+      containers:
+        - name: hazelcast-publisher
+          image: publisher:0.1.0
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 8080
+          - containerPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hazelcast-publisher
+spec:
+  type: LoadBalancer
+  selector:
+    app: hazelcast-publisher
+  ports:
+  - name: app
+    port: 8080
+  - name: grpc
+    port: 9090

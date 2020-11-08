@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package br.com.cardoso.grpc;
+
+option java_multiple_files = true;
+option java_package = "br.com.cardoso.grpc";
+option java_outer_classname = "MessageProto";
+
+service MessageProtoService {
+    rpc SendMessage (MessageRequest) returns (MessageVoid){}
+}
+
+message MessageVoid{}
+
+message MessageRequest {
+    string message = 1;
+}
