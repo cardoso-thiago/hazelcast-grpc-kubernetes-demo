@@ -25,7 +25,7 @@ kind: Service
 metadata:
   name: hazelcast-consumer
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: hazelcast-consumer
   ports:

@@ -5,3 +5,24 @@
 * No deployment: `imagePullPolicy: Never`
 * Abrindo IP externo: `minikube tunnel`
 * Para pegar o IP e a porta para acesso externo: `kubectl get svc`
+
+== Ingress
+
+* Comando para adicionar o ingress http no etc/hosts: `echo "$(minikube ip) publisher.hazelcast" | sudo tee -a /etc/hosts`
+* Comando para adicionar o ingress grpc no etc/hosts: `echo "$(minikube ip) publisher.grpc.hazelcast" | sudo tee -a /etc/hosts`
+* Comandos para criar os certificados e criar o secret:
+
+[source,shell]
+----
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=publisher.grpc.hazelcast/O=publisher.grpc.hazelcast"
+
+openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=publisher.grpc.hazelcast'
+
+openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=publisher.grpc.hazelcast'
+
+openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+
+kubectl create secret generic tls-secret --from-file=tls.crt=server.crt --from-file=tls.key=server.key
+----
+
+* Adicionar o server.crt no TLS do BloomRPC

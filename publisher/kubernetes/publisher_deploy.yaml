@@ -26,7 +26,7 @@ kind: Service
 metadata:
   name: hazelcast-publisher
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: hazelcast-publisher
   ports:
@@ -34,3 +34,40 @@ spec:
     port: 8080
   - name: grpc
     port: 9090
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: publisher-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - host: publisher.hazelcast
+      http:
+        paths:
+          - path: /.*
+            backend:
+              serviceName: hazelcast-publisher
+              servicePort: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: publisher-grpc-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+spec:
+  rules:
+    - host: publisher.grpc.hazelcast
+      http:
+        paths:
+          - backend:
+              serviceName: hazelcast-publisher
+              servicePort: 9090
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - publisher.grpc.hazelcast
