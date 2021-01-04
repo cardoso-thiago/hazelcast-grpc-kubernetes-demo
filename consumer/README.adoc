@@ -1,6 +1,7 @@
 = Processos Necessários
 
 * Alterando o ambiente para o docker: `eval $(minikube docker-env)`
+** Para o fish: minikube -p minikube docker-env | source
 * Build: `docker build -t consumer:0.0.1 .`
 * No deployment: `imagePullPolicy: Never`
 * Abrindo IP externo: `minikube tunnel`
